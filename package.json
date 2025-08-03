@@ -1,0 +1,75 @@
+{
+  "name": "scan-orchestration-platform",
+  "version": "1.0.0",
+  "description": "A lightweight CI/CD orchestration API backend for Jenkins pipeline management",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:docker": "docker-compose run --rm test npm test",
+    "test:docker:coverage": "docker-compose run --rm test npm run test:coverage",
+    "test:docker:simple": "docker-compose run --rm test npm test -- --testPathPattern=simple.test.ts",
+    "test:docker:working": "docker-compose run --rm test npm test -- --testPathPattern=working.test.ts",
+    "test:docker:all": "docker-compose run --rm test npm test -- --testPathPattern=__tests__",
+    "test:docker:all-working": "docker-compose run --rm test npm test -- --testPathPattern='(simple|working).test.ts'",
+    "test:setup": "docker-compose up -d oracle jenkins",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
+  },
+  "keywords": ["jenkins", "ci-cd", "orchestration", "api", "typescript"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "apollo-server-express": "^3.12.1",
+    "graphql": "^16.8.1",
+    "objection": "^3.0.1",
+    "knex": "^3.0.1",
+    "oracledb": "^6.3.0",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.1",
+    "axios": "^1.6.0",
+    "graphql-tools": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/cors": "^2.8.17",
+    "@types/jest": "^29.5.8",
+    "@types/supertest": "^2.0.16",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "supertest": "^6.3.3",
+    "eslint": "^8.55.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": ["**/__tests__/**/*.test.ts"],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/index.ts"
+    ],
+    "transform": {
+      "^.+\\.ts$": ["ts-jest", {
+        "tsconfig": "tsconfig.test.json"
+      }]
+    },
+    "setupFilesAfterEnv": ["<rootDir>/src/__tests__/setup.ts"]
+  }
+} 

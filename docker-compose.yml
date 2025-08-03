@@ -1,0 +1,83 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=oracle
+      - DB_PORT=1521
+      - DB_SERVICE=XE
+      - DB_USER=scan_platform
+      - DB_PASSWORD=password
+      - JENKINS_URL=http://jenkins:8080
+      - JENKINS_USER=admin
+      - JENKINS_TOKEN=your_jenkins_token
+      - API_KEY=your_secure_api_key_here
+      - LOG_LEVEL=info
+      - GRAPHQL_PLAYGROUND=true
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - oracle
+      - jenkins
+    networks:
+      - scan-network
+
+  test:
+    build: 
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - NODE_ENV=test
+      - DB_HOST=oracle
+      - DB_PORT=1521
+      - DB_SERVICE=XE
+      - DB_USER=scan_platform
+      - DB_PASSWORD=password
+      - JENKINS_URL=http://jenkins:8080
+      - JENKINS_USER=admin
+      - JENKINS_TOKEN=your_jenkins_token
+      - API_KEY=test-api-key
+      - LOG_LEVEL=error
+    depends_on:
+      - oracle
+      - jenkins
+    networks:
+      - scan-network
+    volumes:
+      - ./coverage:/app/coverage
+
+  oracle:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PWD=oracle
+      - ORACLE_CHARACTERSET=AL32UTF8
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    networks:
+      - scan-network
+
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      - JENKINS_OPTS=--httpPort=8080
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - scan-network
+
+volumes:
+  oracle_data:
+  jenkins_home:
+
+networks:
+  scan-network:
+    driver: bridge 
